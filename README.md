@@ -5,8 +5,8 @@
 **Registre perso des plugins installés : ce qu'ils font, comment les invoquer, et pourquoi (ou pourquoi pas).**
 
 ![Status](https://img.shields.io/badge/statut-priv%C3%A9-6e5494?style=flat-square)
-![Plugins](https://img.shields.io/badge/plugins%20actifs-4-2ea44f?style=flat-square)
-![Écartés](https://img.shields.io/badge/écartés-2-e05d44?style=flat-square)
+![Plugins](https://img.shields.io/badge/plugins%20actifs-6-2ea44f?style=flat-square)
+![Écartés](https://img.shields.io/badge/écartés-3-e05d44?style=flat-square)
 ![Dernière mise à jour](https://img.shields.io/badge/maj-2026--11--02-blue?style=flat-square)
 
 </div>
@@ -21,8 +21,11 @@
 | 🕸️ [**graphify**](#️-graphify) | *(CLI + skill, hors marketplace)* | Graphe de connaissance du code — requêtes au lieu de grep/lecture brute | `/graphify .`, `graphify query "..."` | ✅ Actif |
 | 🛠️ [**agent-skills**](#️-agent-skills) | `addyosmani/agent-skills` | Cycle de dev complet : spec → plan → build → test → review → ship | `/spec`, `/plan`, `/build`, `/review`, `/ship`... | ✅ Actif |
 | 📚 [**context7**](#-context7) | `upstash/context7` | Doc à jour des bibliothèques (versions récentes) injectée dans le contexte | automatique (serveur MCP) | ✅ Actif |
+| 📊 [**claude-hud**](#-claude-hud) | `jarrodwatts/claude-hud` | Barre d'état : contexte, limites d'usage, agents, todos | automatique (statusLine), `/hud` pour régler | ✅ Actif |
+| 🔥 [**CodeBurn**](#-codeburn) | *(CLI npm, hors marketplace)* | Où partent les tokens (par projet, modèle, tâche) | `codeburn` | ✅ Actif |
 | 🚫 [**OmniRoute**](#-écarté--omniroute) | `diegosouzapw/OmniRoute` | Gateway IA multi-fournisseurs (routage vers 358 providers) | — | ❌ Écarté |
 | 🚫 [**superpowers**](#-non-retenu--superpowers) | `claude-plugins-official` | Méthode de dev complète (brainstorming → plan → sous-agents → TDD), toujours active | — | ❌ Non retenu |
+| 🚫 [**SkillSpector**](#-non-retenu--skillspector) | `NVIDIA/SkillSpector` | Scanner de sécurité des skills avant installation | — | ❌ Non retenu |
 
 ---
 
@@ -164,6 +167,57 @@ Puis `/mcp` → authentification du serveur `plugin:context7:context7`.
 
 ---
 
+## 📊 claude-hud
+
+> *Barre d'état sous la saisie : contexte utilisé, limites d'usage, outils et agents actifs, todos.*
+
+**Marketplace :** `jarrodwatts/claude-hud` (licence MIT)
+**Installation :**
+```
+/plugin marketplace add jarrodwatts/claude-hud
+/plugin install claude-hud@claude-hud
+/reload-plugins
+/hud
+```
+`/hud` (ou `node <plugin>/hud.mjs install`) ne modifie que la clé `statusLine` de `~/.claude/settings.json`, avec une sauvegarde `.bak`. Nécessite Node 22.18+.
+
+**Revue (2026-11-02, v0.15.0) : OK.**
+- Aucun appel réseau dans le code exécuté. La logique tourne dans une cage Node (`--permission`, lectures ciblées, pas de processus enfants). Il ne touche ni à `.credentials.json` ni au trousseau macOS.
+- Le lanceur exécute la version la plus récente présente dans le cache : relire le diff avant tout `/plugin update` (pas de mise à jour automatique configurée).
+
+**À éviter :**
+- `hud report`, qui ouvre une issue publique sur GitHub ;
+- la variable `CLAUDE_HUD_ALLOW_EXTRA_CMD`, qui permet de lancer une commande shell.
+
+Pour couper le HUD le temps d'une session : `CLAUDE_HUD_DISABLE=1`.
+
+---
+
+## 🔥 CodeBurn
+
+> *Tableau de bord dans le terminal : où partent les tokens, par projet, modèle et type de tâche.*
+
+**Package :** [`codeburn`](https://www.npmjs.com/package/codeburn) sur npm (repo [getagentseal/codeburn](https://github.com/getagentseal/codeburn), licence MIT)
+**Installation :**
+```bash
+npm install -g codeburn     # Node 22.13+ ; installé avec la version Node active de nvm
+codeburn
+```
+
+**Revue (2026-11-02, v0.9.27) : OK, en évitant certaines commandes.**
+- Pas de script d'installation npm. Lit les sessions sur le disque. Seul appel réseau en usage normal : la grille de prix publique LiteLLM (GitHub).
+- `codeburn` et `codeburn web` restent en local (le tableau de bord web écoute sur `127.0.0.1`).
+- La télémétrie (soumise à consentement) ne concerne que l'application de bureau, non installée.
+
+**À ne pas utiliser :**
+- `share` et `devices` : serveur ouvert sur `0.0.0.0` et annonce mDNS sur le réseau local, donc données d'usage visibles depuis le Wi-Fi du bureau ;
+- `serve` : non vérifiée, à éviter par prudence ;
+- `menubar` et `update` : téléchargent des binaires.
+
+La partie plugin (serveur MCP, `/codeburn:cost`) n'est pas installée.
+
+---
+
 ## 🚫 Écarté — OmniRoute
 
 **Repo :** [`diegosouzapw/OmniRoute`](https://github.com/diegosouzapw/OmniRoute) — gateway IA gratuite (358 fournisseurs, fallback automatique, compression de tokens)
@@ -204,6 +258,20 @@ Puis `/mcp` → authentification du serveur `plugin:context7:context7`.
 
 ---
 
+## 🚫 Non retenu — SkillSpector
+
+**Repo :** [`NVIDIA/SkillSpector`](https://github.com/NVIDIA/SkillSpector), scanner de sécurité des skills (Apache-2.0). Installé puis désinstallé le 2026-11-02.
+
+**Raisons :**
+- **Envoi de code :** par défaut, il envoie le code scanné au LLM de NVIDIA ; il faut toujours `--no-llm`.
+- **Lenteur :** plus de 10 minutes sur un dépôt entier, contre ~4 s sur la seule partie exécutée d'un plugin.
+- **Faux positifs :** « ne pas installer » sur ponytail et claude-hud, à cause de tests et benchmarks. Il faut relire chaque alerte, donc il ne fait pas gagner de temps.
+- **Angle mort :** il ne voit pas le code d'un serveur MCP lancé par `npx` ou hébergé à distance.
+
+**À la place :** une revue courte à la main (voir ci-dessous).
+
+---
+
 ## 🔑 Prérequis SSH
 
 Certains plugins (`source: "github"` dans leur `marketplace.json`) sont clonés en SSH par Claude Code, quelle que soit la méthode utilisée pour ajouter la marketplace. Si tu vois `Host key verification failed` ou `Permission denied (publickey)` :
@@ -224,5 +292,5 @@ ssh -T git@github.com
 ## ➕ Ajouter un plugin à ce registre
 
 1. `/plugin marketplace add <owner>/<repo>` puis `/plugin install <plugin>@<marketplace>`
-2. Vérifier la légitimité si le plugin touche à des données sensibles (voir grille OmniRoute ci-dessus)
+2. Revue courte (quelques minutes) : auteur et activité du repo, lecture du manifeste, des hooks, de `.mcp.json` et des skills, recherche des appels réseau et des serveurs (`fetch`, `listen`, `0.0.0.0`, télémétrie). Verdict et commandes à éviter (voir grille OmniRoute ci-dessus)
 3. Ajouter une section ici : ce que ça fait, comment l'invoquer, où c'est installé
