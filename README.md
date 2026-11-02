@@ -6,7 +6,7 @@
 
 ![Status](https://img.shields.io/badge/statut-priv%C3%A9-6e5494?style=flat-square)
 ![Plugins](https://img.shields.io/badge/plugins%20actifs-4-2ea44f?style=flat-square)
-![Écartés](https://img.shields.io/badge/écartés-1-e05d44?style=flat-square)
+![Écartés](https://img.shields.io/badge/écartés-2-e05d44?style=flat-square)
 ![Dernière mise à jour](https://img.shields.io/badge/maj-2026--11--02-blue?style=flat-square)
 
 </div>
@@ -22,6 +22,7 @@
 | 🛠️ [**agent-skills**](#️-agent-skills) | `addyosmani/agent-skills` | Cycle de dev complet : spec → plan → build → test → review → ship | `/spec`, `/plan`, `/build`, `/review`, `/ship`... | ✅ Actif |
 | 📚 [**context7**](#-context7) | `upstash/context7` | Doc à jour des bibliothèques (versions récentes) injectée dans le contexte | automatique (serveur MCP) | ✅ Actif |
 | 🚫 [**OmniRoute**](#-écarté--omniroute) | `diegosouzapw/OmniRoute` | Gateway IA multi-fournisseurs (routage vers 358 providers) | — | ❌ Écarté |
+| 🚫 [**superpowers**](#-non-retenu--superpowers) | `claude-plugins-official` | Méthode de dev complète (brainstorming → plan → sous-agents → TDD), toujours active | — | ❌ Non retenu |
 
 ---
 
@@ -177,6 +178,29 @@ Puis `/mcp` → authentification du serveur `plugin:context7:context7`.
 | **Risque retenu** | Route le code/les prompts vers des dizaines de fournisseurs tiers non vérifiés par l'entreprise, même en auto-hébergé |
 
 **Règle retenue :** légitimité du projet et acceptabilité pour router des données pro sont **deux questions séparées**. Un outil peut être parfaitement fiable techniquement et rester à éviter dès qu'il change *où* le code/les prompts sont envoyés, sans revue de gouvernance des données au préalable.
+
+---
+
+## 🚫 Non retenu — superpowers
+
+**Repo :** [`obra/superpowers`](https://github.com/obra/superpowers), également présent dans la marketplace officielle Anthropic (`superpowers@claude-plugins-official`)
+
+**Verdict : projet sérieux, mais doublon avec agent-skills et contradictoire avec ponytail.**
+
+| Vérification | Résultat |
+|---|---|
+| Auteur | Jesse Vincent (Prime Radiant), compte GitHub depuis 2009, ~9 300 followers |
+| Repo | ~311 000 étoiles, licence MIT, actif (dernier push 2026-10-29) |
+| Hook `SessionStart` | Injecte ses règles (« mandatory workflows, not suggestions ») dans **toutes** les sessions, y compris hors code (ex. prototypes Figma). Lecture d'un fichier local uniquement, pas d'appel réseau |
+| Télémétrie | Le « visual companion » (optionnel) charge un logo depuis primeradiant.com avec la version du plugin. Désactivable : `SUPERPOWERS_DISABLE_TELEMETRY=1` |
+| Skill `diagnosing-superpowers` | Peut empaqueter un transcript de session et ouvrir une **issue publique** sur `obra/superpowers` (après accord). Risque de fuite de contenu interne |
+| Coût | Un sous-agent par tâche + une revue après chacune, donc beaucoup de tokens |
+
+**Raison du refus :** même périmètre qu'agent-skills (spec → plan → TDD → review), mais imposé en permanence au lieu d'être appelé à la demande. Les deux ensemble se marchent dessus, et l'obligation de passer par des questions et un plan détaillé, même pour une petite modif, va à l'encontre de ponytail.
+
+**Si on y revient :** essai sur un projet bac à sable, en scope projet, agent-skills désactivé, télémétrie coupée. Il **remplacerait** agent-skills plutôt que de s'y ajouter.
+
+*Évalué le 2026-11-02.*
 
 ---
 
