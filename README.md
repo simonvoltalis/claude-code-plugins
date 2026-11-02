@@ -5,9 +5,9 @@
 **Registre perso des plugins installés : ce qu'ils font, comment les invoquer, et pourquoi (ou pourquoi pas).**
 
 ![Status](https://img.shields.io/badge/statut-priv%C3%A9-6e5494?style=flat-square)
-![Plugins](https://img.shields.io/badge/plugins%20actifs-3-2ea44f?style=flat-square)
+![Plugins](https://img.shields.io/badge/plugins%20actifs-4-2ea44f?style=flat-square)
 ![Écartés](https://img.shields.io/badge/écartés-1-e05d44?style=flat-square)
-![Dernière mise à jour](https://img.shields.io/badge/maj-2026--09--28-blue?style=flat-square)
+![Dernière mise à jour](https://img.shields.io/badge/maj-2026--11--02-blue?style=flat-square)
 
 </div>
 
@@ -20,6 +20,7 @@
 | 🎀 [**ponytail**](#-ponytail) | `DietrichGebert/ponytail` | Pousse vers la solution la plus simple (YAGNI, stdlib avant lib) | `/ponytail`, automatique sur tâche de code | ✅ Actif |
 | 🕸️ [**graphify**](#️-graphify) | *(CLI + skill, hors marketplace)* | Graphe de connaissance du code — requêtes au lieu de grep/lecture brute | `/graphify .`, `graphify query "..."` | ✅ Actif |
 | 🛠️ [**agent-skills**](#️-agent-skills) | `addyosmani/agent-skills` | Cycle de dev complet : spec → plan → build → test → review → ship | `/spec`, `/plan`, `/build`, `/review`, `/ship`... | ✅ Actif |
+| 📚 [**context7**](#-context7) | `upstash/context7` | Doc à jour des bibliothèques (versions récentes) injectée dans le contexte | automatique (serveur MCP) | ✅ Actif |
 | 🚫 [**OmniRoute**](#-écarté--omniroute) | `diegosouzapw/OmniRoute` | Gateway IA multi-fournisseurs (routage vers 358 providers) | — | ❌ Écarté |
 
 ---
@@ -132,6 +133,33 @@ graphify install --project      # scope projet, ou sans --project pour global
 `api-and-interface-design` · `browser-testing-with-devtools` · `ci-cd-and-automation` · `code-review-and-quality` · `code-simplification` · `constraint-driven-development` · `context-engineering` · `debugging-and-error-recovery` · `deprecation-and-migration` · `documentation-and-adrs` · `doubt-driven-development` · `frontend-ui-engineering` · `git-workflow-and-versioning` · `idea-refine` · `incremental-implementation` · `interview-me` · `observability-and-instrumentation` · `performance-optimization` · `planning-and-task-breakdown` · `security-and-hardening` · `shipping-and-launch` · `source-driven-development` · `spec-driven-development` · `test-driven-development`
 
 </details>
+
+---
+
+## 📚 context7
+
+> *Va chercher la documentation à jour d'une bibliothèque (Flutter, Next.js, Prisma…) au lieu de répondre de mémoire.*
+
+**Marketplace :** `upstash/context7` (repo [upstash/context7](https://github.com/upstash/context7), éditeur Upstash, licence MIT)
+**Installation :**
+```
+/plugin marketplace add upstash/context7
+/plugin install context7@context7-marketplace
+```
+Puis `/mcp` → authentification du serveur `plugin:context7:context7`.
+
+**Ce que ça fait :** ajoute un serveur MCP distant (`https://mcp.context7.com/mcp`) avec deux outils :
+
+| Outil | Usage |
+|---|---|
+| `resolve-library-id` | Trouve l'identifiant d'une bibliothèque (ex. `Flutter` → `/flutter/website`) |
+| `query-docs` | Récupère la doc et des exemples de code, éventuellement pour une version précise |
+
+**Comment l'utiliser :** aucune commande à taper. L'assistant l'appelle tout seul dès qu'une question porte sur une bibliothèque, un SDK, une API ou un CLI. Pour le forcer, il suffit de préciser « vérifie dans Context7 ».
+
+**⚠️ Point de vigilance :** les requêtes partent vers un service externe (Upstash). On n'y envoie que des noms de bibliothèques et des questions techniques génériques, jamais de code interne, d'URL interne, de secret ou de donnée d'adhérent.
+
+**Vérifié le 2026-11-02 :** connexion OK, la recherche test « Flutter » renvoie bien la doc officielle.
 
 ---
 
